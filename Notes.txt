@@ -1,0 +1,62 @@
+PHP configuration
+==================
+3 things to look at:error reporting, output buffering and timezone.
+
+phpinfo() method describes the way PHP is configured on our machine: localhost:9999/?phpinfo=1 gives us the same info.
+
+- Loaded Configuration File: C:\wamp\bin\apache\apache2.4.9\bin\php.ini - tells us where the configuration file for PHP lives (shortcut accessible in wamp launcher)
+Errors
+---------
+We do a search for display_errors. We can see that it is set to On. We also have commented out values for the display_errors directive:
+; Development Value = On
+; Production Value = Off
+We should set the the production value to off always in production.
+
+error_reporting = E_ALL
+=> Show all errors, warnings and notices including coding standards. E_ALL is a number (32767 - bits)
+
+html_errors = On
+=> PHP now has the ability to insert HTML links to documentation related to errors. For performance we should disable it in production servers.
+
+Output buffering
+-----------------
+output_buffering = 4096
+Possible values are integer, On and Off.
+;   On = Enabled and buffer is unlimited. (Use with caution)
+;   Off = Disabled
+;   Integer = Enables the buffer and sets its maximum size in bytes.
+We will turn it Off - we will see later why.
+
+Timezone
+----------
+date.timezone = UTC
+Defines the default timezone used by the date functions.
+In wamp I saw : date.timezone = Europe/Paris
+
+We can set our server to the timezone at which we are currently at: http:www.php.net/manual/en/timezones.php
+
+Note: We should restart all wamp services so that our configurations can take effect.
+
+MySQL configuration
+====================
+Set a new root password (default is '').
+Always set a root password as we may import production data someday for debugging.
+
+CMD -> cd C:\wamp\bin\mysql\mysql5.6.17\bin -> mysqladmin -u root password
+New password: my_password
+
+If we run the command we get an access denied error as we are telling mysqladmin that we will be providing a password.
+
+mysqladmin -u root -p password
+It asks us to enter the current password and the new password.
+
+Note: We have broken phpmyadmin as it is not set to use a password. We should open wamp/apps/phpmyadmin4.1.14/config.inc.php and set the line containing the string password as follows:
+$cfg['Servers'][$i]['password'] = 'my_password';
+
+How pages are served
+======================
+1. a. User types in the URL. Browser sends request to web server. 
+b. The Apache HTTP daemon is the software that intercepts the request, finds the file in the FS to respond to the request (ex. index.php). 
+c. Apache sees that it is a PHP file and hence processes the PHP. 
+d. While doing so Apache goes back and forth to the database to get data. 
+e. Then Apache renders the HTML, which is sent to the browser.
