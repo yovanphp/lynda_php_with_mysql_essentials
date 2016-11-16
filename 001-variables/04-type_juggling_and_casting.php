@@ -2,7 +2,7 @@
 /*
 When PHP converts a variable implicitly to another type we call this process type juggling. Examples:
 - When an integer is concatenated to a string it is converted to a string
-- When a number is added to a string number (3 + '2.5' gives 7.5), the output is numric
+- When a number is added to a numeric string (3 + '2.5' gives 7.5), the output is numeric
 - When PHP prints a boolean value it converts it to a string: 1 or empty
 
 When we convert a variable explicitly to another type, the process is called type casting. This can be done in 2 ways:
