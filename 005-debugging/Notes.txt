@@ -1,0 +1,61 @@
+1. Turn on error reporting in development
+- In php.ini file
+	display_errors = On
+	error_reporting = E_ALL
+
+- In PHP code
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
+//Return the current level -> returns a number see errorfunc.constants.php on php.net for the complete list.
+error_reporting();
+
+There are 4 types of main errors: Fatal, Syntax, Warnings and Notices.
+
+See the logs: C:/wamp/logs/php_error.log
+
+This log file is accessible in the WAMP menu.
+
+Code that can help us debug
+----------------------------
+echo $var;
+print_r($array);
+gettype($var);
+var_dump($variable); // Both type and value
+get_defined_vars(); // array of defined variables
+debug_backtrace(); // show stacktrace or backtrace. It gives us a report of functions calls made in certain point in time.
+
+
+Errors
+---------
+We do a search for display_errors. We can see that it is set to On. We also have commented out values for the display_errors directive:
+; Development Value = On
+; Production Value = Off
+We should set the the production value to off always in production.
+
+error_reporting = E_ALL
+=> Show all errors, warnings and notices including coding standards. E_ALL is a number (32767 - bits)
+
+html_errors = On
+=> PHP now has the ability to insert HTML links to documentation related to errors. For performance we should disable it in production servers.
+
+Output buffering
+-----------------
+output_buffering = 4096
+Possible values are integer, On and Off.
+;   On = Enabled and buffer is unlimited. (Use with caution)
+;   Off = Disabled
+;   Integer = Enables the buffer and sets its maximum size in bytes.
+We will turn it Off - we will see later why.
+
+Timezone
+----------
+date.timezone = UTC
+Defines the default timezone used by the date functions.
+In wamp I saw : date.timezone = Europe/Paris
+
+We can set our server to the timezone at which we are currently at: http:www.php.net/manual/en/timezones.php
+
+Note: We should restart all wamp services so that our configurations can take effect.
+
+

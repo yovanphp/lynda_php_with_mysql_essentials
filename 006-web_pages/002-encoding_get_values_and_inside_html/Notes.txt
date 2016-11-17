@@ -1,0 +1,47 @@
+1. There are reserved characters for our URLS. The following list of characters are reserved and will cause pbs if we use them directly in the URL.
+!, #, $, %, &, ', (, ), *, +, etc.
+
+When we construct URLS for links we must encode the reserved characters so that they do not interfere with the function of the URL.
+Encoding a reserved character means converting the character to a a string made of % and 2_digit_hex_val example %20.
+
+We would like to encode the reserved characher before requesting for the page and once the page is received, we would like to decode them.
+
+To encode a string in PHP: urlencode($string)
+- letters, numbers, underscore, dash are unchanged
+- reserved characters become % + 2-digit hexadecimal string
+- Spaces become "+"
+
+If we don't encode for example Johnson & Johnson in the browser bar we see ?id=7&company=Johnson%20&%20Johnson
+And in the page we will get $_GET['company'] = Johnson
+We should use urlencode() while building the query parameters in our links.
+When we use urlencode() we see: ?id=7&company=Johnson+%26+Johnson 
+and successfully print $_GET['company'] = Johnson & Johnson
+Spaces are encoded to + and & encoded to %26
+Note: PHP automatically decodes the values of our query parameters before it assigns them to the $_GET superglobal.
+URL encoding is important for GET requests only. When using cookies and POST we don't need to encode our data.
+
+There exists a urldecode($string) method that can be used to decode strings. But here we do not need them.
+
+Another string encoding function is rawurlencode():
+- letters, numbers, underscore, dash are unchanged
+- reserved characters become % + 2-digit hexadecimal string
+- Spaces become "%20", i.e spaces are also encoded to a 2-digit hexadecimal value.
+In the browser bar we see: ?id=7&company=Johnson%20%26%20Johnson and
+successfully print $_GET['company'] = Johnson & Johnson onscreen.
+
+If we view our source:
+<p><a href="002-second.php?id=7&company=Johnson & Johnson">Second Page</a></p>
+<p><a href="002-second.php?id=7&company=Johnson+%26+Johnson">Second Page with encoded url parameters</a></p>
+<p><a href="002-second.php?id=7&company=Johnson%20%26%20Johnson">Second Page with raw encoded url parameters</a></p>
+
+So when should we use rawurlencode() VS urlencode
+- Use rawurlencode when encoding the URL path i.e everything before the '?'. 
+This is important for Apache to load the correct file (which may contain spaces).
+- Use urlencode to encode the query string, i.e everything that comes after ?.
+This is because spaces are better encoded with +.
+
+However rawurlencode is more compatible generally - JS, AJAX and web services consumers will easily understand %20 for spaces.
+
+But better use rawurlencode to encode the path and urlencode for the query string in our links.
+
+

@@ -1,0 +1,20 @@
+There are only 3 ways that a server can get user data from the web:
+- URLS/links -> GET (HTTP method)
+- Forms -> POST
+- Cookies -> COOKIE
+
+We can send data from a link using the query string (made from query parameters). When clicking on a link, the GET HTTP method is called.
+
+When a page request is made, PHP automatically creates an associative array out of the query parameters.
+This associative array is called a Super global variable.
+
+- Super globals are available in all scopes
+- Assigned by PHP before processing page code
+
+$_GET is the superglobal associated with URLS and links.
+It is not a constant but a variable. $_GET superglobal is an associative array.
+
+Typing a URL or clicking a link makes get requests to the server.
+
+NOTE: We should always encode our query parameters so that they are interpreted correcly.
+For example: ?company=Johnson&Peterson

@@ -1,0 +1,4 @@
+1. How to provide an associative array to an object constructor of a class so that the object is intialized.
+2. What does unset() do.
+3. Does list(args..) work on associative arrays.
+4. Does PHP have function test(args...) {} syntax.
