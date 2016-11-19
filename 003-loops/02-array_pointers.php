@@ -23,7 +23,7 @@ In the loop, we increment the positon of the pointer. and recheck our while cond
 As we can see, the while loop below is like a foreach loop. 
 Database pointers are not the same as array pointers.
 They are similar but not the same.
-The database pointer is moved by the database driver each time we request a row. As soon as we access the current pointer element, the cursor is moved to the next elenent.
+The database pointer is moved by the database driver each time we request a row. As soon as we access the current pointer element, the cursor is moved to the next element.
  */
 
 $ages = [4, 8, 15, 16, 9, 23, 54, 14, 5, 6];

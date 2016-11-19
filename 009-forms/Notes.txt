@@ -1,0 +1,111 @@
+Intro
+======
+There are 3 ways that we can send user data to the server.
+1. Typing a URL or clicking on a link. -> GET
+2. Submitting forms -> POST
+3. Through cookies
+
+When we type a URL, we are performing a get request. PHP takes our query parameters and push the in the superglobal $_GET associative array.
+
+- All values posted by forms will be pushed in the $_POST superglobal (associative array).
+
+- We do not need to encode form values are they are sent inside the request body and not in the URL.
+
+We can encode the URL inside the form's action attribute using rawurlencode and urlencode.
+
+- If we are accessing a result page without being posted there, we are doing a get request. Hence the $_POST superglobal is empty. Accessing values in this unsset associative array will raise an error - Undefined index.
+Hence we must detect form submission before accessing the form values inside $_POST.
+
+Detecting form submission
+==========================
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
+	$user_name = isset($_POST['user_name']) ? $_POST['user_name'] : "";
+	$password = isset($_POST['password']) ? $_POST['password'] : "";
+}
+
+OR
+
+if(isset($_POST['submit'])) {
+	$user_name = isset($_POST['user_name']) ? $_POST['user_name'] : "";
+	$password = isset($_POST['password']) ? $_POST['password'] : "";
+
+}
+
+The above can be used to have both the form and result pages in a single page + a form that submits to itself.
+
+Single page form processing
+==============================
+Handy for having all the logic related to forms in one single file and displaying form errors.
+
+
+Validating form values
+=======================
+Common validations
+- Presense
+- String length
+- Type - strings, floats etc
+- Inclusion in a set - M or F for example
+- Uniqueness - For example while registering a user we should check that the user is unique
+- Format - email, dates format for example
+- custom validations - existence of file, age between 18 and 65
+
+Fails
+---------
+Presence - !isset($value) || empty($value)
+stringth min length - strlen($value) < $min
+stringth max length - strlen($value) > $max
+string type - !is_string($value)
+inclusion in a set - !in_array($set)
+uniqueness - needs a database
+regex - preg_match($regex, $subject)
+preg_match('/PHP/', 'PHP is fun.');
+preg_match('/@/', 'nobody@nowhere.com');
+strpos($value, '@') === false; // We should cross-check with false because if '@' is at the first index, we will get 0 which is juggled to false in PHP.
+
+Problems with validation logic
+-------------------------------
+strpos($value, '@') === false; // we should use the === instead of 0 as '@' at the first index gives 0 and 0 == false will return true, which is not what we want.
+
+echo is_equal(0, false);
+echo is_equal(4, true);
+echo is_equal(0, null);
+echo is_equal(0, '0');
+echo is_equal(0, '');
+echo is_equal(0, 'dbc'); 
+echo is_equal('1', '01');
+echo is_equal('', null);
+echo is_equal(3, '3 dogs');
+echo is_equal(100, "1e2");
+echo is_equal(100, 100.0);
+echo is_equal('abc', true);
+echo is_equal('123', '   123');
+echo is_equal('123', '+0123');
+
+The code above shows possible cases of false positive using == for comparing values.
+This is because of PHP's type juggling while comparing values.
+sting VS null -> converts null to ''
+boolean VS other -> converts other to boolean
+number vs other -> converts other to number
+
+For example when comparing 0 with 'abc', or 0 with a we get true.
+Explanation: 'a', 'telephone', 'fgb', ';;;;' when compared to 0 are first converted to a number, which PHP cannot. So they are converted to 0. Hence 0 == 0 which gives true.
+
+3 == '3 dogs' -> 3 == 3 which is true
+
+IMPORTANT: We should use === while comparing values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,16 @@
+include() and require() are used so that we can keep our code well organised - so that we don't repeat code in pages.
+
+We should include
+- functions files
+- layout sections like navigation, sidebars, headers and footers
+- reusable HTML/PHP code like images carousel
+- CSS and JS if they were not included in headers.
+
+There are 4 variations of includes functions:
+- include(), require(), and require_once()
+
+require() raises a fatal page error if the page cannot be found. 
+include() will continue displaying the page.
+include_once() keeps an array of files that are already included. 
+If the file has already been included, it will not add it to that array.
+require_once() does the same.

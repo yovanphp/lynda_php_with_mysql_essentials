@@ -1,0 +1,94 @@
+Headers
+========
+1. When the server sends back an HTML page, before the page it sends back headers, which are basic information so that the browser knows what type of data to expect.
+
+The browser sends HTTP headers along its request to begin with.
+
+Example of response HTTP headers
+---------------------------------
+HTTP/1.1 200 OK // Status code
+Connection:Keep-Alive
+Content-Length:487
+Content-Type:text/html
+Date:Sat, 19 Nov 2016 08:23:16 GMT
+Keep-Alive:timeout=5, max=100
+Server:Apache/2.4.9 (Win64) PHP/5.5.12
+X-Powered-By:PHP/5.5.12
+
+Example of request headers
+---------------------------
+GET /lynda_php_with_mysql_essentials/008-headers/001-headers.php HTTP/1.1
+Host: localhost:9999
+Connection: keep-alive
+Pragma: no-cache
+Cache-Control: no-cache
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Referer: http://localhost:9999/lynda_php_with_mysql_essentials/008-headers/
+Accept-Encoding: gzip, deflate, sdch, br
+Accept-Language: en-US,en;q=0.8,fr;q=0.6
+
+Headers are key/pair values.
+
+It is PHP that automatically constructs the header before sending it to the web server which then sends back the response. 
+But we can explicitly tell PHP how we would like it to construct the header using header($string). 
+For example 
+- header('Content-Type: application/pdf') - this is for instructing the browser that the content reponse is not HTML but pdf, so that it can handle it correctly.
+- header('Content-Disposition: attachment; filename='xyx.pdf') - the content is an attachment.
+- header('HTTP/1.1 500 Internal Server Error'); // Status code
+
+IMPORTANT: 
+Headers must be set before any other content, space or line return or before any white spaces in included files. But they can come after whitespaces inside PHP tags.
+
+We will get a warning if we try to set a header after the server is serving its reponse:
+Warning: Cannot modify header information - headers already sent by....
+
+If we don't get errors while sending headers after content has been served, we may have ouput buffering turned on.
+
+headers_list() returns an array of the headers sent by the server before the response.
+
+The rare times where we will set response headers is while doing redirects.
+
+Page redirection
+=================
+Normally used to send the user to another page based upon some conditions, for example on successful login to main page or when unsuccessful back to login form.
+Redirection to the checkout page.
+
+In HTTP we can redirect the browser to a new URL 302 Redirect.
+It has two parts: The status code and the location.
+HTTP 1.1/302 Found
+Location: path
+
+We don't have to set the two header requests for redirection. PHP does it implicitly if we use header('Location: login.php');
+
+When PHP sees the header redirection function called, it ignores all that come next in the page and immediatly makes a new request for the resource: a second new GET request takes place.
+
+To prevent the extra data to be sent, we should exit after the redirection call.
+
+We should use a function for redirection as it is very common.
+
+function redirect_to($new_location) {
+	header('Location: ' . $new_location);
+	exit;
+}
+
+Output buffering
+==================
+Important: Headers must be set before anything is sent to the server, unless output buffering is turned on.
+When output buffering is turned on, before sending the response, PHP puts the information in a temporary output buffer. 
+As we have access to the output buffer, we are still inside PHP and have access to the output buffer. We hence can modify our headers. Nothing has been sent to the web server yet.
+
+When the buffer is full (or at a certain measure), the header and content is sent to the web server which sends the response off.
+Because of this extra step where the output buffer is filled and then sent to the web server, we have to pay a small performance penalty.
+
+Two ways to turn on output buffering:
+- in the php.ini file. By default output_buffering has no value. It is Off. 
+output_buffering can have 3 values On, Off, an integer. For performance reason we set a value of 4096
+- in the code we cam explicitly turn output buffering on a page to page basis.
+ob_start(); // This must come before any content, to start output buffering, else we would have sent content before setting the headers. 
+ob_end_flush(); // Now we are ready to flush the buffer to the server.
+
+Best practice: Turn it on in the php.ini file if we want to by setting  it to 4096. This ensures that it is turned on and that we don't have to do it in the code.
+
+

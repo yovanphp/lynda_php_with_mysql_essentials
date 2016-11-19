@@ -1,4 +1,6 @@
-1. There are reserved characters for our URLS. The following list of characters are reserved and will cause pbs if we use them directly in the URL.
+Encoding get values in links and URL
+====================================
+There are reserved characters for our URLS. The following list of characters are reserved and will cause pbs if we use them directly in the URL.
 !, #, $, %, &, ', (, ), *, +, etc.
 
 When we construct URLS for links we must encode the reserved characters so that they do not interfere with the function of the URL.
@@ -44,4 +46,30 @@ However rawurlencode is more compatible generally - JS, AJAX and web services co
 
 But better use rawurlencode to encode the path and urlencode for the query string in our links.
 
+Encoding HTML special characters
+=================================
+HTML has special characters for example open and close tags.
+We can break our HTML if we use these reserved characters in our text - <, >, & and ". We have to encode these reserved HTML characters in their repective HTML entities : &lt;, &gt;, &amp;, &quot;
+htmlspecialchars() and htmlentities() are functions used to encode HTML.
 
+For example: <p><a href="#"><Click> & learn more</a></p>
+Our browser will interprete <Click> as an HTML tag and break our code. 
+htmlspecialchars('<Click> here & learn more')
+We can view page source to see our encoded strings: <p><a href="#">&lt;Click&gt; here &amp; learn more</a></p>
+
+Note: htmlspecialcharsdecode() is used to decode our encoded HTML strings, but we typically never use them as it is the browser that does that for us while showing us our text onscreen.
+
+htmlentities() encode ALL characters in our strings to their equivalent HTML entities. For example #, $, % etc are converted.
+
+$text = "ôé╣─ú" is printed as if we do not encode them.
+If we view source we can see that the characters in our text has been converted to their equivalent HTML entities:
+<p><a href="#">&ocirc;&eacute;╣─&uacute;</a></p>
+
+htmlspecialchars() are used to encode our text so that we don't break our code.
+htmlentities() is used to encode our text so that they are printed onscreen correctly. ALL characters in our text are  encoded to their equivalent HTML entities.
+
+We should use rawurlencode(), urlencode and htmlspecialchars() in conjuction when using URL and links in PHP.
+See 004-all_encoding.php
+If we view source: <p><a href="php%2Fcreate%2Fpage%2Furl.php?param1=This+is+a+string+with+%3C+%3E&amp;param2=%26%23%3F%2A%24%5B%5D%2B+are+bad+characters">&lt;Click here &amp; learn more&gt;</a></p>
+
+We should also encode our url with htmlspecialchars() so that our browser does not break our code if it contains special characters for example in query parameters.

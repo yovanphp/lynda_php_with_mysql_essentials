@@ -13,9 +13,9 @@ echo 'For consumers: ' . $for_consumers . '<br>';
 </head>
 <body>
 	<div>
-		<p><a href="002-second.php?id=<?= $id ?>&company=<?= $company ?>">Second Page</a></p>
-		<p><a href="002-second.php?id=<?= urlencode($id) ?>&company=<?= urlencode($company) ?>">Second Page with encoded url parameters</a></p>
-		<p><a href="002-second.php?id=<?= rawurlencode($id) ?>&company=<?= rawurlencode($company) ?>">Second Page with raw encoded url parameters</a></p>
+		<p><a href="02-second.php?id=<?= $id ?>&company=<?= $company ?>">Second Page</a></p>
+		<p><a href="02-second.php?id=<?= urlencode($id) ?>&company=<?= urlencode($company) ?>">Second Page with encoded url parameters</a></p>
+		<p><a href="02-second.php?id=<?= rawurlencode($id) ?>&company=<?= rawurlencode($company) ?>">Second Page with raw encoded url parameters</a></p>
 		<p><a href="bio/<?= rawurlencode('William Shakespere') . '/quotes.php/' . '?quote=' . urlencode($quote) ?>">Encoding URLS correctly</a></p>
 	</div>
 </body>
