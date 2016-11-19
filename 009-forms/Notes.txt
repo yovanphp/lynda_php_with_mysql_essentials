@@ -66,6 +66,8 @@ Problems with validation logic
 -------------------------------
 strpos($value, '@') === false; // we should use the === instead of 0 as '@' at the first index gives 0 and 0 == false will return true, which is not what we want.
 
+Comparision with ==
+----------------------
 echo is_equal(0, false);
 echo is_equal(4, true);
 echo is_equal(0, null);
@@ -83,7 +85,7 @@ echo is_equal('123', '+0123');
 
 The code above shows possible cases of false positive using == for comparing values.
 This is because of PHP's type juggling while comparing values.
-sting VS null -> converts null to ''
+string VS null -> converts null to ''
 boolean VS other -> converts other to boolean
 number vs other -> converts other to number
 
@@ -94,7 +96,20 @@ Explanation: 'a', 'telephone', 'fgb', ';;;;' when compared to 0 are first conver
 
 IMPORTANT: We should use === while comparing values.
 
+empty()
+--------
+Important:
+'', 0, '0', null, false and [] or array() are empty.
 
+Pb: We would like to get the number of children an employer has. If we enter 0, this will mean that he entered nothing and the value is not set.
+Radio button - 0 and 1 for visible
+check boxes - 0 for true and 1 for false
+select - 0, 1, 2, 3 for status
+input - number of children
+
+Diplaying validation error effectively
+=======================================
+The best way to display errors on a form is to get all the possible errors on the form element and then display them all at once.
 
 
 
