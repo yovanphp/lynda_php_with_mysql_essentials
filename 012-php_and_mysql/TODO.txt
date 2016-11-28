@@ -1,0 +1,4 @@
+1. Make a web page to demonstrate SQL injection.
+2. See best practices for SQL in PHP on the net for protecting the database.
+3. How to change the modification_date of a row on update of a column.
+4. Do concrete examples for prepared statements for CRUD.

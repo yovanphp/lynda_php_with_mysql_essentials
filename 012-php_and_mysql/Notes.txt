@@ -1,0 +1,224 @@
+1. PHP offers 3 different database APIs to connect to MySQL.
+ - mysql: original MySQL API - deprecated
+ - mysqli: MySQL improved API
+ - PDO: PHP Data Objects
+ They are similar, so we can easily learn one and switch to another.
+
+2. 
+- The 3 are included with PHP. 
+- Only PDO is not pre-configured for MySQL as PDO supports other databases. We have to configure PDO in the php.ini file to use MySQL. 
+- mysqli has both procedural and object-oriented interface.
+PDO is only object-oriented.
+- mysqli and PDO both support prepared statements.
+
+The procedural and object-oriented interface are quite similar for mysqli.
+
+procedural   					Object-oriented
+------------------------		--------------------------
+mysqli_connect 					$mysqli = new mysqli
+mysqli_connect_errno			$mysqli->connect_errno			
+mysqli_connect_error			$mysqli->connect_error
+mysqli_real_escape_string		$mysqli->real_escape_string
+mysqli_query					$mysqli->query
+mysqli_fetch_assoc				$mysqli->fetch_assoc
+mysqli_close					$mysqli->close
+
+See http://php.net/manual/en/mysqlinfo.api.choosing.php for more info on the different database APIs.
+
+We will use the procedural version of mysqli.
+
+PHP database interaction in 5 steps.
+-------------------------------------
+1. Create a database connection
+2. Perform database query
+3. If any, use returned data - display for example
+4. Release returned data - free up memory
+5. Close database connection
+
+Important: 
+Steps 1 & 2 should happen only once per PHP script(every new page), while steps 2 through 4 can be repeated as many times as we want.
+
+1. To create a connection to DB
+We can get a handle to the connection using $connection = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+But sometimes we may fail to connect - we should check for any database connection errors and fatally exit the application before any PHP is executed.
+
+if(mysqli_connect_errno()) {
+	die('Database connection failed: ' . 
+		mysqli_connect_error() . 
+		'(' . mysqli_connect_errno() .')');
+}
+
+Finally we should always close our connections:
+<?php mysqli_close($connection) ?>
+
+2. To retrieve data.
+mysqli_query($query) - used to do the querying
+mysqli_fetch_row($result) - used to work with the results if any, from the query
+mysqli_free_result($result) - free result at the end to release memory
+
+a. Define the query in variable: 
+	$query = "SELECT * FROM subjects ";
+	$query .= "WHERE visible = 1 ";
+	$query .= "ORDER BY position ASC";
+
+b. Send the query to MySQL:
+	$result = mysqli_query($query);
+	if(!result)
+		die('Database query failed');
+	Note: $result is not an ordinary PHP array. It is a collection where we can retrieve rows, called a resource.
+	But if we have a problem with our SQL (like a syntax error), $result will be false (instead of type object). 
+	So we must check for theses errors and die with a message.
+
+c. Use return data if any using mysqli_fetch_row($result)
+	- We will get the current row from our $result collection using a while loop. 
+	- The current row will be null as soon as the function cannot retrieve the next row from $result. And hence loop exists.
+	- The process of retrieving the next row from the $result collection is the same as with ARRAY POINTERS.
+	As the collection is not a PHP array, but a MySQL result set, PHP does not have access to the array pointer, hence we cannot use foreach on the result set.
+	mysqli_fetch_row($result) automatically increments the array pointer for us.
+
+	while($row = mysqli_fetch_row($result)) {
+		var_dump($row);
+		echo '<hr>';
+	}
+
+	Note: As we can see with var_dump($row), the current row is of type array. The array is an associative array with the key as integers and the value the row's columns values.
+	array (size=6)
+		  0 => string '1' (length=1)
+		  1 => string 'About Widget Corp' (length=17)
+		  2 => string '1' (length=1)
+		  3 => string '1' (length=1)
+		  4 => string '2016-11-20 19:58:10' (length=19)
+		  5 => string '2016-11-20 20:00:41' (length=19) 
+
+ 4. We should always release the returned data: mysqli_free_result($result);
+
+III - Working with retrieved data
+===================================
+There are 3 ways we can fetch the rows from the result set using mysqli.
+- mysqli_fetch_row
+	- Results are in a standard array
+	- Keys are integers
+
+- mysqli_fetch_assoc
+	- Results are in a an associative array
+	- Keys are column names
+
+- mysqli_fetch_array
+	- Results in either or both types of arrays. By default it is both (the result set will be a lot larger which will have a higher memory utilization). 
+	But we can tell the function which type of collection we would like for our result set: MYSQL_NUM, MYSQL_ASSOC, MYSQL_BOTH
+
+- mysqli_fetch_object : We won't look at it. 
+
+<div id="associative_array" class="retrieve_rows">
+		<?php  
+			while($row = mysqli_fetch_assoc($result)) {
+				var_dump($row);
+				echo '<hr>';
+			}
+		?>
+	</div>
+	<div id="array_both" class="retrieve_rows">
+		<?php  
+			while($row = mysqli_fetch_array($result, MYSQL_BOTH)) {
+				var_dump($row);
+				echo '<hr>';
+			}
+		?>
+	</div>
+	<div id="array_both_array" class="retrieve_rows">
+		<?php  
+			while($row = mysqli_fetch_array($result, MYSQL_NUM)) {
+				var_dump($row);
+				echo '<hr>';
+			}
+		?>
+	</div>
+	<div id="array_both_assoc" class="retrieve_rows">
+		<?php  
+			while($row = mysqli_fetch_array($result, MYSQL_ASSOC)) {
+				var_dump($row);
+				echo '<hr>';
+			}
+		?>
+	</div>
+
+The BEST way to fetch data is mysqli_fetch_assoc
+
+IV - Creating records
+=======================
+With SELECT statements either get a resource back or the result of running the query is false.
+But with INSERT, UPDATE and DELETE, the result is a boolean only. Success: true and Failure: false.
+
+mysqli_query($connection, $query) is for executing any query - querying, delete, update ect.
+
+As we saw while creating a new record, the $result obtained while running the INSERT statement can either be true or false.
+Usually if the result is successful, we redirect to some page.
+And if the query fails, i.e we got an error, we can show a message on screen.
+Note: mysqli_error($connection) will get us the last error that occured on the database server.
+But we don't want to our users to see database related errors on screen.
+
+IMPORTANT: $id = mysqli_insert_id($connection); // This returns the last id of the record inserted using the particular connection. 
+
+V - Updating and deleting records
+====================================
+Sometimes it may happen that our UPDATE or DELETE statement are correct, but nothing occured on the database side.
+For example trying to update a record with id = 2000, which does not exist => Nothing happens.
+
+If we want to know whether some changes occured on the database side, we should use mysqli_affected_rows($connection) > 0 see if rows values were modified by our query.
+
+ mysqli_affected_rows($connection) returns the number of rows affected by the query. 
+ If no rows were affected it returns 1.
+ If the columns values that we wanted to change are the same as before in the database, MySQL will not bother updating the rows and mysqli_affected_rows($connection) returns 0.
+
+ While deleting a record we must always use this type of queries, so that we ensure ourselves that we delete only one record:
+ DELETE FROM subjects
+ 	WHERE id = 5
+ 	LIMIT 1;
+
+ VI - SQL injection
+ ===================
+Sometimes our dynamic data can break our SQL statements.
+$var = "Today's Widget Trivia";
+INSERT INTO my_table (subject) VALUES ('{$var}');
+This renders to INSERT INTO my_table (subject) VALUES ('Todays' Widget Trivia'); which accidently closes our '' at "Todays".
+This results in an SQL error.
+Dynamic values come from users and we as developers don't have any control over it.
+
+Example of SQL injection:
+$menu_name = "'); DROP TABLE subjects; '"; 
+
+We need to escape strings to make them safe for SQL.
+All string data should be escaped with mysqli_real_escape_string($connection, $string).
+mysqli_real_escape_string($connection, $string) adds \ to our ', sanitizes ASCII for null and carridge returns.
+Only strings should be escape with mysqli_real_escape_string($connection, $string). 
+Because of this reason, we don't add quotes while doing inserts for integers for example.
+To be safe we cast the values other that string values to their types before doing the inserts.
+
+For example: 
+$menu_name = "Today's Widget Trivia";
+$position = 4;
+$visible = 1;
+
+$menu_name = mysqli_real_escape_string($connection, $menu_name);
+$position = (int) $position;
+$visible = (int) $visible;
+
+Data that should be escaped - anything that comes from a user:
+- url strings, form data, cookie values, or database values that were tampered by a user.
+
+Prepared statements are important:
+1. For performance. With a string as a query, the database has to parse the string, compile it so that it can run it. It does this evertime the 
+With prepared statements all this work is done once and the query run several times with only the values changing.
+2. Prepared statements eliminate the possiblity of SQL injection as it seperates the query from the dynamic data.
+- There is no need to escape the values. 
+- The data is automatically casted to the corresponding type: so need for quotes to delimit string values.
+
+// TODO : Do concrete examples using prepared statements.
+
+
+
+
+
+
+
+

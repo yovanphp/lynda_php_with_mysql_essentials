@@ -1,0 +1,1 @@
+1.  See how to drop a database if exists and recreate it in MySQL.

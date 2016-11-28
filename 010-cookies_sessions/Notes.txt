@@ -1,0 +1,123 @@
+Cookies
+========
+A way to get user data to the server is through browser cookies. Cookies are small bits of data that are stored in the browser. They are important that they help the server remember the user's state, i.e who the user is and what they were doing. 
+Without cookies the server don't recognise when multiple page requests come from a user. 
+We cannot rely on IP addresses as they may be the same for multiple users on the same network. Or the user may change IP addresses between requests - mobile forms using different access points while in movement.
+Servers when looking at the cookie sent in a new request recognise that it is the same user/browser that did previous requests.
+
+How a cookie is created
+-------------------------
+1. User sends to a request to the web server. 
+Example of a request:
+GET /first_page.php HTTP/1.1
+Host: www.kiyodesigns.com
+Accept: */*
+
+Browsers cannot create nor read a cookie until a request come in.
+
+If the server wants to send back a cookie to the browser it runs the set-cookie command and the data it wants to save, along with the page response.
+Cookies sent by the server to the browser are sent in the header of the response.
+Example of header in the response from the server:
+HTTP/1.1 200 OK
+Content-type: text/html
+Set-Cookie: admin_id=502 -> The cookie header sent with the response.
+
+The browser on receiving the response stores the cookie on the local computer for future requests.
+Upon a new request, the browser sends the cookie back to the server in the request header.
+GET /second_page.php HTTP/1.1
+Host: www.kiyodesigns.com
+Cookie: admin_id=502 -> Browser sets the cookie in the header while making a new request to server
+Accept: */*
+
+A cookie cannot be created if no request is made.
+
+When the user makes a request, PHP sets the cookie in the response header and sends it with the response. It sets the cookie parameters in the $_COOKIE superglobal.
+The browser stores the cookie on the disk and sends it to the server in the reuest header while making a new request.
+
+Cookies are set in PHP using the setcookie($name, $value, $expire) function. 
+$name and $value are the name and value associated with the cookie. They work like a key/value pair. 
+If we want to retrieve a cookie associated to a user, we will refer to this cookie by the name - the key in the $_COOKIE superglobal. 
+$expire is for how long we want to keep the cookie alive. The expiration is measured using the Unix timestamp. 
+We cn get the current time in Unix timestamp by using the time() function. To set a time, we can add to this current time. Unix timestamp is measured in seconds.
+For example to set the expiration of a cookie for a week:
+$expire = time() + (60 * 60 * 24 * 7);
+
+setcookie('test', 45, time() + (60 * 60 *24 * 7)); sets a cookie name 'test', who's value is 45 and having an expiration date of a month.
+
+Cookies are set in the reponse header. Headers can be set before anything is sent in the response, unless output buffering is turned on. Same goes for cookies. They should be set in the header before any other ouput in the response.
+
+We can use Dev Tools to view our cookies. As we can see, cookies are easily accessible. They can be easily tampered with by hackers - we should never store sensitive information in cookies.
+
+We can get cookie values from the $_COOKIE associative array, using the name of the cookie - which is the key in the superglobal.
+
+Steps of using a cookie - review
+---------------------------------
+1. A use makes a request for a page.
+2. In this requested page, we have set a cookie with the setcookie(name, value, date) function. This cookie is set in the header of the response to the user request.
+3. Upon receiving the response, the browser stores the cookie on disk.
+4. Now for every consequent new request, the cookie is sent back to the server in the request header.
+
+We can use cookie to store user preferences like fonts, user preferred language for the site, user name for quick access in input.
+
+Note: As cookies are associative arrays, we must test that they exist before we access them, else we will get an error.
+This is mainly because maybe the user did not request a page where a cookie was set, has deleted the cookie in the browser or the cookie has simply expired.
+
+Note: When we access a cookie in our code (we are reading it), the server is accessing it from the request header.
+This means that if we set the cookie to a new value, but try to access it (with $_COOKIE[cookie_name]), we won't see the updated value if we try to print it immediately - they have not yet been stored in the browser and we are still accessing them from the request, which contains the old value.
+
+Unsetting a cookie
+-------------------
+Case: When a user logs-in we store his user id in a cookie. And when he logs out, we want to delete this cookie by unsetting its value.
+Wrong way (good for other variables): unset($_COOKIE['user_id'])
+This is wrong as $_COOKIE['user_id'] is not the cookie stored in the user's browser, but the value that came from the last request. Unsetting it won't change anything as it will still keep coming with every request. We have just unsetted the value in our code and NOT deleted the cookie in the user's browser.
+
+To unset a cookie, we must explicitly do it in the browser. Right ways:
+- setcookie($name) sets the cookie in the browser as empty.
+- setcookie($name, null)
+- setcookie($name, $value, time() - 3600) : set the cookie to an expiration date in the past.
+
+We can combine the last two to be more explicit - we tell the browser to set the cookie value to null and then tell it that the cookie is no more needed and it can delete it by setting the expiration date in the past.
+
+Sessions
+-----------
+We can also get user data from sessions. Sessions files are stored on the server side, not like ordinary cookies stored at the browser's side. They rely on cookies to exchange data from the server to the user's browser.
+
+The session file is stored on the server's file system. The server sends a reference to the session file (session id) in the header of the response. The browser gets the reference and stores it as a cookie in the computer's file system. On each request, the browser sends back the session reference (session id) to the server, which gets the session data from its file system using the reference.
+
+Sessions are stored on the server side. On the client side only a reference to the session is stored.
+
+Pros:
+- More storage (a browser cookie is max 4kB). The size of a session file depends on the disk storage of the server.
+- Smaller request sizes. Suppose we really stored 4kB in a cookie. On every request, the browser would send 4kB of data to the server only for the cookie info. If we have a session, only the session id is sent in every request.
+- As the user data is stored in a session file on the server's file system, all the data is concealed which makes the information more secure and less hackable. We only store a cookie in the browser for the reference of the session id.
+
+Cons:
+- Slower access as we have to find the session file using the session id and read it to access its contents.
+- Sessions expire by design when the browser is closed. A cookie can live for much longer. 
+- The session file remains on the web server despite the fact that it expires on browser close. We have to manually maintain our webserver to clean these files.
+
+The server automatically gets the session file for us using the reference.
+
+We start a session using session_start();
+Behind the scenes, session_start() tells PHP to grab the session cookie from the computer's file system, read the session id from it and populate the $_SESSION superglobal.
+If the session file does not exist, it is created and prepared to send back a reference to the user using a cookie, which can be accessible in the future.
+
+As sessions use cookies, we must do session_start() before any content is returned.
+
+If we run only this command in our PHP code, we can see in Dev Tools that a cookie with key: PHPSESSID and value: 3f9q963q2fuv1ttseq9nlho912 has been created in our browser.
+PHPSESSID is the default name for session related cookies defined in php.ini. 3f9q963q2fuv1ttseq9nlho912 is a reference to the session file on the server's FS.
+
+We shoud note that when we set a session value, we can immediately get the value. This is because contrary to cookies, sessions live on the server. The can get the data directly from the server.
+While we write the data to the session file, we can immediately read the data.
+
+Common commands for sessions
+----------------------------
+- get the session id
+- unsset a single/value pair by setting it to null. For example $_SESSION['username'] = null;
+- clear all stored values
+
+
+
+
+
+

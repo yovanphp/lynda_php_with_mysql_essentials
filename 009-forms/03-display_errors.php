@@ -11,7 +11,15 @@ if(is_server_request('POST')) {
 	$last_name = sanitize($_POST['last_name']);
 	$email = sanitize($_POST['email']);
 	$required = ['first_name', 'last_name'];
+	$max_length = [
+		'first_name' => 8,
+		'last_name' => 8,
+		'email' => 10
+	];
+	
 	set_required_errors($required, $errors);
+	set_max_length_errors($max_length, $errors);
+
 	if(!is_valid_email($email))
 		$errors['email'] = 'Email is not valid';
 	if(empty($errors)) {
@@ -61,7 +69,7 @@ if(is_server_request('POST')) {
 	<?php if(!empty($errors)) : ?>
 		<div class="error">
 			<ul>
-			<?php foreach($errors as $input => $error) : ?>
+			<?php foreach($errors as $field => $error) : ?>
 				<li><?= $error?></li>
 			<?php endforeach; ?>
 			</ul>

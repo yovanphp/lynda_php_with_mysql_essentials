@@ -1,6 +1,15 @@
 <?php
+
+$errors = [];
+
 function is_blank($value) {
 	return !isset($value) || (empty($value) && !is_numeric($value));
+}
+
+function field_name_as_text($fieldname) {
+	$fieldname = str_replace('_', ' ', $fieldname);
+	$field_name = ucfirst($fieldname);
+	return $fieldname;
 }
 
 function has_max_length($value, $max) {
@@ -23,15 +32,11 @@ function is_server_request($method) {
 	return $_SERVER['REQUEST_METHOD'] === $method;
 }
 
-function redirect_to($location) {
-	header('Location: ' . $location);
-	exit;
-}
-
-function set_required_errors($fields, &$errors) {
+function set_required_errors($fields) {
+	global $errors;
 	foreach ($fields as $field) {
 		if(is_blank($_POST[$field])) {
-			$errors[$field] = ucfirst(str_replace('_', ' ', trim($field))) . ' cannot be blank!';
+			$errors[$field] = field_name_as_text($field) . ' cannot be blank!';
 		}
 	}
 }
@@ -40,7 +45,7 @@ function set_max_length_errors($fields) {
 	global $errors;
 	foreach ($fields as $field => $max) {
 		if(!has_max_length($_POST[$field], $max)){
-			$errors[$field] = ucfirst(str_replace('_', ' ', trim($field))) . ' is too long!';
+			$errors[$field] = field_name_as_text($field) . ' is too long!';
 		} 
 	}
 }

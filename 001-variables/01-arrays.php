@@ -46,4 +46,4 @@ $employees = [
 
 var_dump(array_keys($employees));
 
-
+echo "first_name is a key in the \$employees array: " . array_key_exists('first_name', $employees);

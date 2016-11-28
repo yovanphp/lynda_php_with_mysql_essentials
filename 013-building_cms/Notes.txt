@@ -1,0 +1,32 @@
+1. Always do a blueprint of software before developing. This prevents cluttering of our brain.
+
+2. After blueprinting, we should model our database, before developing.
+
+3. Set up the project structure.
+We have basically two folders in our project folder: public and includes.
+public - accessible to users on the web
+includes - won't be accessible to the public. This folder may contain includes for database connection for example.
+They are accessible in our code, but not accessible on the web.
+Note: A further configuration should be done so that our domain name, for example kiyodesigns.com points to the public directory.
+
+4. For our cms, we would need an admin area where we can perform CRUD operations. 
+This area will be restricted by authentication.
+We also have a public area where we can view the content only. 
+Not all contents will be accessible in the public area.
+
+5. For a start, we can code the admin area without authentication, perform some CRUD operations and then view our content in the public area. Always create a common styling template before coding. 
+It will be basic CSS just to make our code look like a BASIC website.
+
+6. Do mockup of pages without any PHP.
+First of all extract common HTML in header.inc.php and footer.inc.php. 
+
+7. Use require_once any functions files, such as utility functions.
+
+8. Add database interactivity to the pages.
+Reminder: PHP Interaction in 5 steps
+-------------------------------------
+1. Create a database connection
+2. Perform database query
+3. Use return values (if any)
+4. Release returned data
+5. Close connection.

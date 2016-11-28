@@ -1,0 +1,36 @@
+1. Change the default password of root which is '' by default.
+2. mysql -u root --password=my_password or mysql -u root -p or mysql -u root -p cms to connect directly to the database, without using use.
+3. SHOW DATABASES;
+4. CREATE DATABASE cms;
+5. USE cms;
+6. SHOW TABLES;
+7. DROP DATABASE cms;
+9. For security reasons, we must grant all privileges to a user other than the root. Here the user can access the database ONLY on localhost.
+If the user's account is compromised, only databases where he has access will be compromised. Hence it is a good practice to create new users for each database and grant them access only to this database.
+GRANT ALL PRIVILEGES ON cms.*
+	TO 'yovan'@'localhost'
+    IDENTIFIED BY 'some_password';
+10. CREATE TABLE cm_salesrep(
+		id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+		name VARCHAR(50) NOT NULL,
+		code VARCHAR(50) NOT NULL,
+		visible TINYINT(1) NOT NULL
+	); 
+	
+	CREATE TABLE cm_client(
+		id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+		name VARCHAR(50) NOT NULL,
+		salesrep_id INT(11) NOT NULL,
+		visible TINYINT(1) NOT NULL,
+		CONSTRAINT FK_CLIENT_SALESREP FOREIGN KEY (salesrep_id) 
+	    	REFERENCES cm_salesrep (id) 
+	    	ON DELETE CASCADE
+	    	ON UPDATE CASCADE
+	); 
+
+11. SHOW COLUMNS FROM cm_client;
+12. DROP TABLE cm_client;
+13. See 01-cms.sql
+
+
+
